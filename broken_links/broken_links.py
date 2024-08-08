@@ -85,6 +85,28 @@ def remove_anchor(url):
     return url_without_anchor
 
 
+def check_if_redirects_to_index(url):
+    """
+    Checks if a URL redirects to an index file.
+
+    Args:
+        url (str): The URL to check.
+
+    Returns:
+        bool: True if the URL redirects to an index file, False otherwise.
+    """
+    try:
+        response = requests.head(url, allow_redirects=False, timeout=5)
+        if response.status_code in [301, 302] and 'Location' in response.headers:
+            location = response.headers['Location']
+            if location.endswith('/index.html'):
+                return True
+        return False
+    except requests.RequestException as e:
+        logging.debug(f"RequestException for URL {url}: {e}")
+        return False
+
+
 def ensure_trailing_slash(url):
     """
     Ensures that any URL that is not a file ends with a '/'.
