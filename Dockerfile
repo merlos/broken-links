@@ -11,4 +11,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Set the entrypoint to the CLI script
-ENTRYPOINT ["python", "-m", "link_checker.cli"]
+ENTRYPOINT ["python", "-m", "broken_links.cli"]

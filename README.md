@@ -1,4 +1,4 @@
-# Link Checker GitHub Action && command line tool
+# Broken links Checker GitHub Action && command line tool
 
 This tool scrapes all pages within a specified URL and checks if the destination links exist. It reports the original page, the text of the anchor, the destination URL, and whether the link is working or not. If any link does not work, the tool exits with an error code. It also provides a summary of the analysis.
 
@@ -10,22 +10,26 @@ It can be run as a GitHub Action or as a command line tool.
 
 #### Installation
 
-1. **Clone the repository:**
+1. Clone the repository:
 
    ```sh
-   git clone https://github.com/merlos/link-checker-action.git
-   cd link-checker-action
+   git clone https://github.com/merlos/broken-links.git
+   cd broken-links
    ````
 
-- Install the package:
+2. Install the package:
 
-pip install .
+    ```
+    pip install .
+    ```
 
-Running the Link CheckerUse the link-checker command to run the script:
+3. Use the `broken-links` command to run the script:
 
-link-checker http://example.com --only-error --ignore-file ./check-ignore
+```
+broken-links http://example.com --only-error --ignore-file ./check-ignore
+```
 
-Command-Line Arguments
+Command-line arguments:
 
 - `url` (optional): The base URL to start scraping from. Default is `http://localhost:4444/`.
 - `--only-error` or `-o` (optional): If set, only display errors. Default is `false`.
@@ -66,7 +70,9 @@ This action does not produce any outputs. However, at the end of the analysis, i
 ### Examples of Usage
 
 #### Basic Usage (external URL)
-name: Link Checker
+
+```yaml
+name: Broken-links Checker
 
 on: [push]
 
@@ -82,6 +88,7 @@ jobs:
         with:
           url: 'http://example.com'
           only-errors: 'true'
+```
 
 #### Check links with MkDocs
 
@@ -167,18 +174,18 @@ jobs:
 
 Clone the repository:
 ```sh
-git clone https://github.com/merlos/link-checker-action
-cd link-checker-action
+git clone https://github.com/merlos/broken-links
+cd broken-links
 ```
 Start coding!
 
 ### Build the docker image
 
 ```sh
-docker build -t link-checker .
+docker build -t broken-links .
 ```
 ```sh
-docker run --rm link-checker http://example.com --only-error --ignore-file ./check-ignore
+docker run --rm broken-links http://example.com --only-error --ignore-file ./check-ignore
 ```
 
 ### Tests
