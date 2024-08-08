@@ -44,6 +44,8 @@ def load_ignore_patterns(ignore_file):
 
     with open(ignore_file, 'r') as file:
         patterns = [line.strip() for line in file if line.strip()]
+    if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
+        logging.debug(f"Loaded ignore patterns: {patterns}")  
     return patterns
 
 def should_ignore(url, patterns):
