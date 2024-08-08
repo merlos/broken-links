@@ -161,51 +161,55 @@ def scrape_links(base_url, only_error, ignore_patterns):
 
         try:
             response = requests.get(url)
-            soup = BeautifulSoup(response.text, 'html.parser')
-            for link in soup.find_all('a', href=True):
-                anchor_text = link.text.strip()
-                logging.debug(f"Found link: {anchor_text} -> {link['href']} (current Page: {url})")
-                link_url = urljoin(url, link['href'])
-                links_analyzed += 1
-
-                if should_ignore(link_url, ignore_patterns):
-                    if not only_error:
-                        logging.info(f"Page: {url}, Anchor: {anchor_text}, Link: {link_url}, Working: Ignored")
-                    continue
-                if link_url in urls_working_checked and not only_error:
-                    logging.info(f"Skipping link {link_url} as it has already been checked")
-                    continue
-                original_link_url = link_url
-                link_url = remove_anchor(link_url)
-                link_url = ensure_trailing_slash(link_url)
-                is_working, code = check_link(link_url)
-                if original_link_url != link_url:
-                    logging.debug(f"Link {original_link_url} was modified to {link_url}")
-                if is_working:
-                    total_links_working += 1
-                    urls_working_checked.append(link_url)
-                    if urlparse(base_url).netloc == urlparse(link_url).netloc:
-                        internal_links_working += 1
-                    else:
-                        external_links_working += 1
-                else:
-                    total_links_not_working += 1
-                    if urlparse(base_url).netloc == urlparse(link_url).netloc:
-                        internal_links_not_working += 1
-                    else:
-                        external_links_not_working += 1
-
-                if not is_working or not only_error:
-                    logging.info(f"Page: {url}, Anchor: {anchor_text}, Link: {link_url}, Working: {is_working} [{code}]")
-
-                if link_url not in visited and urlparse(base_url).netloc == urlparse(link_url).netloc:
-                    if not link_url.startswith(base_url):
-                        logging.debug(f"Skipping appending link {link_url} as it does not start with base URL {base_url}")
-                        continue
-                    logging.debug(f"Adding link {link_url} to visit list")  
-                    to_visit.append(link_url)
         except requests.RequestException as e:
             logging.error(f"Failed to retrieve {url}: {e}")
+            continue
+
+        soup = BeautifulSoup(response.text, 'html.parser')
+        for link in soup.find_all('a', href=True):
+            anchor_text = link.text.strip()
+            logging.debug(f"Found link: {anchor_text} -> {link['href']} (current Page: {url})")
+            link_url = urljoin(url, link['href'])
+            links_analyzed += 1
+            if should_ignore(link_url, ignore_patterns):
+                if not only_error:
+                    logging.info(f"Page: {url}, Anchor: {anchor_text}, Link: {link_url}, Working: Ignored")
+                continue
+            if link_url in urls_working_checked and not only_error:
+                logging.info(f"Skipping link {link_url} as it has already been checked")
+                continue
+            original_link_url = link_url
+            link_url = remove_anchor(link_url)
+            is_working, code = check_link(link_url)
+            if original_link_url != link_url:
+                logging.debug(f"Link {original_link_url} was modified to {link_url}")
+            if is_working:
+                total_links_working += 1
+                urls_working_checked.append(link_url)
+                if urlparse(base_url).netloc == urlparse(link_url).netloc:
+                    internal_links_working += 1
+                else:
+                    external_links_working += 1
+            else:
+                total_links_not_working += 1
+                if urlparse(base_url).netloc == urlparse(link_url).netloc:
+                    internal_links_not_working += 1
+                else:
+                    external_links_not_working += 1
+
+            if not is_working or not only_error:
+                logging.info(f"Page: {url}, Anchor: {anchor_text}, Link: {link_url}, Working: {is_working} [{code}]")
+
+            # is the link internal and not in the visited list? -> Add it to the list of links to visit
+            if link_url not in visited and urlparse(base_url).netloc == urlparse(link_url).netloc:
+                # Ensure that the url starts with the base path, otherwise ignore it. 
+                # For example if the base path is /blog/ and the link is /about/ we should ignore it.
+                if not link_url.startswith(base_url):
+                    logging.debug(f"Skipping appending link {link_url} as it does not start with base URL {base_url}")
+                    continue
+                logging.debug(f"Adding link {link_url} to visit list")  
+                to_visit.append(link_url)
+       
 
     logging.info(f"\nSummary:")
     logging.info(f"Pages analyzed: {pages_analyzed}")
