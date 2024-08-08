@@ -5,6 +5,7 @@ import fnmatch
 import os
 import logging
 
+
 def check_link(url):
     """
     Checks if a given URL is working and redirects to an existing page.
@@ -96,7 +97,7 @@ def check_if_redirects_to_index(url):
         response = requests.head(url, allow_redirects=False, timeout=5)
         if response.status_code in [301, 302] and 'Location' in response.headers:
             location = response.headers['Location']
-            if location.endswith('/index.html'):
+            if location.endswith('/index.html') or location.endswith('/'):
                 return True
         return False
     except requests.RequestException as e:
@@ -175,8 +176,10 @@ def scrape_links(base_url, only_error, ignore_patterns):
                 if not only_error:
                     logging.info(f"Page: {url}, Anchor: {anchor_text}, Link: {link_url}, Working: Ignored")
                 continue
-            if link_url in urls_working_checked and not only_error:
-                logging.info(f"Skipping link {link_url} as it has already been checked")
+            # If the link has already been checked 
+            if link_url in urls_working_checked:
+                if not only_error: # display only if not only errors are being displayed
+                    logging.info(f"Skipping link {link_url} as it has already been checked")
                 continue
             original_link_url = link_url
             link_url = remove_anchor(link_url)
@@ -198,7 +201,8 @@ def scrape_links(base_url, only_error, ignore_patterns):
                     external_links_not_working += 1
 
             if not is_working or not only_error:
-                logging.info(f"Page: {url}, Anchor: {anchor_text}, Link: {link_url}, Working: {is_working} [{code}]")
+                FALSE="\033[91m FALSE \033[0m" # Text in red color
+                logging.info(f"Page: {url}, Anchor: {anchor_text}, Link: {link_url}, Working: {is_working} {FALSE} [{code}]")
 
             # is the link internal and not in the visited list? -> Add it to the list of links to visit
             if link_url not in visited and urlparse(base_url).netloc == urlparse(link_url).netloc:
@@ -207,6 +211,13 @@ def scrape_links(base_url, only_error, ignore_patterns):
                 if not link_url.startswith(base_url):
                     logging.debug(f"Skipping appending link {link_url} as it does not start with base URL {base_url}")
                     continue
+                # Ensure that the link ends with a trailing slash if it's not a file
+                # For example if the link is /about we should add a trailing slash to it if it's a directory
+                path = urlparse(link_url).path
+                if not path.endswith('/') and not path.split('/')[-1].count('.'):
+                    if check_if_redirects_to_index(link_url):
+                        link_url = ensure_trailing_slash(link_url)
+                        logging.debug(f"Added trailing slash to {link_url}")
                 logging.debug(f"Adding link {link_url} to visit list")  
                 to_visit.append(link_url)
        
