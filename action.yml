@@ -1,0 +1,24 @@
+name: Link Checker
+description: A GitHub Action to check links on a website.
+author: Your Name
+
+inputs:
+  url:
+    description: 'The base URL to start scraping from'
+    required: false
+    default: 'http://localhost:4444/'
+  only-errors:
+    description: 'Only display errors'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.url }}
+    - ${{ inputs.only-errors }}
+
+branding:
+  icon: 'link'
+  color: 'blue'
