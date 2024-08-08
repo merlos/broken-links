@@ -177,7 +177,21 @@ Clone the repository:
 git clone https://github.com/merlos/broken-links
 cd broken-links
 ```
+
+Set a virtual environment:
+```sh
+python -m venv venv
+source venv/bin/activate
+```
+
+```sh
+pip install .
+```
+
+
 Start coding!
+
+
 
 ### Build the docker image
 
