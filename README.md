@@ -13,8 +13,9 @@ It can be run as a GitHub Action or as a command line tool.
 1. **Clone the repository:**
 
    ```sh
-   git clone https://github.com/yourusername/link_checker.git
-   cd link_checker
+   git clone https://github.com/merlos/link-checker-action.git
+   cd link-checker-action
+   ````
 
 - Install the package:
 
@@ -47,7 +48,7 @@ This tool can also be used as a GitHub Action to automatically check links in yo
 ### Inputs
 - `url` (optional): The base URL to start scraping from. Default is `http://localhost:4444/`.
 - `only-errors` (optional): If set to true, only display errors. Default is `false`.
-- `ignore-file` (optional): Path to the ignore file. Default is `./check-ignore`. If the parameter is set and the file does not exist, the action exits with an error.
+- `ignore-file` (optional): Path to the ignore file. Default is `./check-ignore`. If the parameter is set and the file does not exist, the action exits with an error. See _Ignore File Format_ section above for more information.
 
 ### Outputs
 
