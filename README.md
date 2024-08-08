@@ -160,5 +160,23 @@ jobs:
           only-errors: 'true'
           ignore-file: './check-ignore'
 ```
+
+
+## Development
+
+Clone the repository:
+```sh
+git clone https://github.com/merlos/link-checker-action
+```
+Start coding!
+
+### Tests
+To run the tests, use the following command:
+
+```sh
+python -m unittest discover tests
+```
+
+
 ## License
 This project is licensed under the terms of the [GNU General Public License v3.0](LICENSE) by merlos.
