@@ -1,24 +1,32 @@
 import requests
 from bs4 import BeautifulSoup
-import argparse
 from urllib.parse import urljoin, urlparse
 import fnmatch
 import os
+import logging
 
 def check_link(url):
     """
-    Checks if a given URL is working.
+    Checks if a given URL is working and redirects to an existing page.
 
     Args:
         url (str): The URL to check.
 
     Returns:
-        bool: True if the URL is working, False otherwise.
+        bool: True if the URL is working and redirects to an existing page, False otherwise.
     """
     try:
         response = requests.head(url, allow_redirects=True, timeout=5)
-        return response.status_code == 200
-    except requests.RequestException:
+        if response.status_code in [200]:
+            return True
+        elif response.status_code in [301, 302]:
+            logging.debug(f"Received redirect to {response.headers['Location']}")
+            return check_link(response.headers['Location'])
+        else:
+            logging.debug(f"Received status code {response.status_code} for URL {url}")
+            return False
+    except requests.RequestException as e:
+        logging.debug(f"RequestException for URL {url}: {e}")
         return False
 
 def load_ignore_patterns(ignore_file):
@@ -90,12 +98,13 @@ def scrape_links(base_url, only_error, ignore_patterns):
             soup = BeautifulSoup(response.text, 'html.parser')
             for link in soup.find_all('a', href=True):
                 anchor_text = link.text.strip()
+                logging.debug(f"Found link: {anchor_text}")
                 link_url = urljoin(base_url, link['href'])
                 links_analyzed += 1
 
                 if should_ignore(link_url, ignore_patterns):
                     if not only_error:
-                        print(f"Page: {url}, Anchor: {anchor_text}, Link: {link_url}, Ignored: True")
+                        logging.info(f"Page: {url}, Anchor: {anchor_text}, Link: {link_url}, Ignored: True")
                     continue
 
                 is_working = check_link(link_url)
@@ -113,22 +122,23 @@ def scrape_links(base_url, only_error, ignore_patterns):
                         external_links_not_working += 1
 
                 if not is_working or not only_error:
-                    print(f"Page: {url}, Anchor: {anchor_text}, Link: {link_url}, Working: {is_working}")
+                    logging.info(f"Page: {url}, Anchor: {anchor_text}, Link: {link_url}, Working: {is_working}")
 
                 if link_url not in visited and urlparse(base_url).netloc == urlparse(link_url).netloc:
                     to_visit.append(link_url)
         except requests.RequestException as e:
-            print(f"Failed to retrieve {url}: {e}")
+            logging.error(f"Failed to retrieve {url}: {e}")
 
-    print(f"\nSummary:")
-    print(f"Pages analyzed: {pages_analyzed}")
-    print(f"Links analyzed: {links_analyzed}")
-    print(f"Total links working: {total_links_working}")
-    print(f"Total links not working: {total_links_not_working}")
-    print(f"External links working: {external_links_working}")
-    print(f"External links not working: {external_links_not_working}")
-    print(f"Internal links working: {internal_links_working}")
-    print(f"Internal links not working: {internal_links_not_working}")
+    logging.info(f"\nSummary:")
+    logging.info(f"Pages analyzed: {pages_analyzed}")
+    logging.info(f"Links analyzed: {links_analyzed}")
+    logging.info(f"Total links working: {total_links_working}")
+    logging.info(f"Total links not working: {total_links_not_working}")
+    logging.info(f"External links working: {external_links_working}")
+    logging.info(f"External links not working: {external_links_not_working}")
+    logging.info(f"Internal links working: {internal_links_working}")
+    logging.info(f"Internal links not working: {internal_links_not_working}")
 
     if total_links_not_working > 0:
         exit(1)
+
