@@ -19,9 +19,6 @@ def check_link(url):
         response = requests.head(url, allow_redirects=True, timeout=5)
         if response.status_code in [200]:
             return True, response.status_code
-        elif response.status_code in [301, 302]:
-            logging.debug(f"Received redirect to {response.headers['Location']}")
-            return check_link(response.headers['Location'])
         else:
             logging.debug(f"Received status code {response.status_code} for URL {url}")
             return False, response.status_code
