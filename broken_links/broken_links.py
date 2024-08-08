@@ -27,7 +27,7 @@ def check_link(url):
             return False, response.status_code
     except requests.RequestException as e:
         logging.debug(f"RequestException for URL {url}: {e}")
-        return False, response
+        return False, None
 
 def load_ignore_patterns(ignore_file):
     """
