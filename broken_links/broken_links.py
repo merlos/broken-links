@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, urlunparse
 import fnmatch
 import os
 import logging
@@ -18,16 +18,16 @@ def check_link(url):
     try:
         response = requests.head(url, allow_redirects=True, timeout=5)
         if response.status_code in [200]:
-            return True
+            return True, response.status_code
         elif response.status_code in [301, 302]:
             logging.debug(f"Received redirect to {response.headers['Location']}")
             return check_link(response.headers['Location'])
         else:
             logging.debug(f"Received status code {response.status_code} for URL {url}")
-            return False
+            return False, response.status_code
     except requests.RequestException as e:
         logging.debug(f"RequestException for URL {url}: {e}")
-        return False
+        return False, response
 
 def load_ignore_patterns(ignore_file):
     """
@@ -64,6 +64,45 @@ def should_ignore(url, patterns):
             return True
     return False
 
+
+def remove_anchor(url):
+    """
+    Removes the anchor (fragment) from a URL.
+
+    Args:
+        url (str): The URL to process.
+
+    Returns:
+        str: The URL without the anchor.
+    """
+    parsed_url = urlparse(url)
+    # Reconstruct the URL without the fragment
+    url_without_anchor = urlunparse(parsed_url._replace(fragment=''))
+    return url_without_anchor
+
+
+def ensure_trailing_slash(url):
+    """
+    Ensures that any URL that is not a file ends with a '/'.
+
+    Args:
+        url (str): The URL to process.
+
+    Returns:
+        str: The processed URL with a trailing slash if it's not a file.
+    """
+    parsed_url = urlparse(url)
+    path = parsed_url.path
+
+    # Check if the path ends with a file extension
+    if not path.endswith('/') and not path.split('/')[-1].count('.'):
+        path += '/'
+
+    # Reconstruct the URL with the modified path
+    new_url = urlunparse(parsed_url._replace(path=path))
+    return new_url
+
+
 def scrape_links(base_url, only_error, ignore_patterns):
     """
     Scrapes all pages within a URL and checks if the destination links exist.
@@ -87,6 +126,8 @@ def scrape_links(base_url, only_error, ignore_patterns):
 
     to_visit = [base_url]
     visited = set()
+    base_path = urlparse(base_url).path
+    urls_working_checked = []
 
     while to_visit:
         url = to_visit.pop()
@@ -100,18 +141,26 @@ def scrape_links(base_url, only_error, ignore_patterns):
             soup = BeautifulSoup(response.text, 'html.parser')
             for link in soup.find_all('a', href=True):
                 anchor_text = link.text.strip()
-                logging.debug(f"Found link: {anchor_text}")
-                link_url = urljoin(base_url, link['href'])
+                logging.debug(f"Found link: {anchor_text} -> {link['href']} (current Page: {url})")
+                link_url = urljoin(url, link['href'])
                 links_analyzed += 1
 
                 if should_ignore(link_url, ignore_patterns):
                     if not only_error:
-                        logging.info(f"Page: {url}, Anchor: {anchor_text}, Link: {link_url}, Ignored: True")
+                        logging.info(f"Page: {url}, Anchor: {anchor_text}, Link: {link_url}, Working: Ignored")
                     continue
-
-                is_working = check_link(link_url)
+                if link_url in urls_working_checked and not only_error:
+                    logging.info(f"Skipping link {link_url} as it has already been checked")
+                    continue
+                original_link_url = link_url
+                link_url = remove_anchor(link_url)
+                link_url = ensure_trailing_slash(link_url)
+                is_working, code = check_link(link_url)
+                if original_link_url != link_url:
+                    logging.debug(f"Link {original_link_url} was modified to {link_url}")
                 if is_working:
                     total_links_working += 1
+                    urls_working_checked.append(link_url)
                     if urlparse(base_url).netloc == urlparse(link_url).netloc:
                         internal_links_working += 1
                     else:
@@ -124,9 +173,13 @@ def scrape_links(base_url, only_error, ignore_patterns):
                         external_links_not_working += 1
 
                 if not is_working or not only_error:
-                    logging.info(f"Page: {url}, Anchor: {anchor_text}, Link: {link_url}, Working: {is_working}")
+                    logging.info(f"Page: {url}, Anchor: {anchor_text}, Link: {link_url}, Working: {is_working} [{code}]")
 
                 if link_url not in visited and urlparse(base_url).netloc == urlparse(link_url).netloc:
+                    if not link_url.startswith(base_url):
+                        logging.debug(f"Skipping appending link {link_url} as it does not start with base URL {base_url}")
+                        continue
+                    logging.debug(f"Adding link {link_url} to visit list")  
                     to_visit.append(link_url)
         except requests.RequestException as e:
             logging.error(f"Failed to retrieve {url}: {e}")
@@ -143,4 +196,3 @@ def scrape_links(base_url, only_error, ignore_patterns):
 
     if total_links_not_working > 0:
         exit(1)
-
