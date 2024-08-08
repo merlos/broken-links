@@ -168,8 +168,18 @@ jobs:
 Clone the repository:
 ```sh
 git clone https://github.com/merlos/link-checker-action
+cd link-checker-action
 ```
 Start coding!
+
+### Build the docker image
+
+```sh
+docker build -t link-checker .
+```
+```sh
+docker run --rm link-checker http://example.com --only-error --ignore-file ./check-ignore
+```
 
 ### Tests
 To run the tests, use the following command:
