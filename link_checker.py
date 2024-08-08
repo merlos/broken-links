@@ -93,7 +93,7 @@ def scrape_links(base_url, only_error):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Scrape a website and check all links.")
-    parser.add_argument("url", nargs="?", default="http://localhost:444/", help="The base URL to start scraping from.")
+    parser.add_argument("url", nargs="?", default="http://localhost:4444/", help="The base URL to start scraping from.")
     parser.add_argument("--only-error", "-o", action="store_true", help="Only display errors.")
     args = parser.parse_args()
 
