@@ -8,7 +8,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
-COPY link_checker.py .
+COPY . .
 
-# Set the entrypoint to the Python script
-ENTRYPOINT ["python", "link_checker.py"]
+# Set the entrypoint to the CLI script
+ENTRYPOINT ["python", "-m", "link_checker.cli"]

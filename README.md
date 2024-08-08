@@ -1,48 +1,70 @@
-# Link Checker GitHub Action
+# Link Checker GitHub Action && command line tool
 
-This GitHub Action scrapes all pages within a specified URL and checks if the destination links exist. It reports the original page, the text of the anchor, the destination URL, and whether the link is working or not. If any link does not work, the action exits with an error code. It also provides a summary of the analysis.
+This tool scrapes all pages within a specified URL and checks if the destination links exist. It reports the original page, the text of the anchor, the destination URL, and whether the link is working or not. If any link does not work, the tool exits with an error code. It also provides a summary of the analysis.
 
-## Inputs
+It can be run as a GitHub Action or as a command line tool.
 
-### `url`
+# Usage
 
-**Optional** The base URL to start scraping from. Default is `http://localhost:4444/`.
+### Command-Line Utility
 
-### `only-errors`
+#### Installation
 
-**Optional** If set to `true`, only display errors. Default is `false`.
+1. **Clone the repository:**
 
-### `ignore-file`
+   ```sh
+   git clone https://github.com/yourusername/link_checker.git
+   cd link_checker
 
-**Optional** Path to the ignore file. Default is `./check-ignore`. If the parameter is set and the file does not exist, the action exits with an error.
+- Install the package:
 
-#### Ignore File Format
+pip install .
 
-The ignore file should contain one URL pattern per line. The patterns can include wildcards (`*`) to match multiple URLs. Here are some examples:
+Running the Link CheckerUse the link-checker command to run the script:
+
+link-checker http://example.com --only-error --ignore-file ./check-ignore
+
+Command-Line Arguments
+
+- `url` (optional): The base URL to start scraping from. Default is `http://localhost:4444/`.
+- `--only-error` or `-o` (optional): If set, only display errors. Default is `false`.
+- `--ignore-file` or `-i` (optional): Path to the ignore file. Default is `./check-ignore`. If the parameter is NOT set and the file does not exist, it checks all the links. If the parameter is set and the file does not exist, the tool exits with an error. 
+
+### Ignore File Format
+
+The ignore file should contain one URL pattern per line. The patterns can include wildcards (*) to match multiple URLs. Here are some examples:
 
 - `http://example.com/ignore-this-page` - Ignores this specific URL.
 - `http://example.com/ignore/*` - Ignores all URLs that start with `http://example.com/ignore/`.
 - `*/ignore-this-path/*` - Ignores all URLs that contain `/ignore-this-path/`.
-- https://*.example.com* - Ignores all the urls in domain and subdomain of `example.com` (f.i. `https://www.example.com`, `https://subdomain.example.com`, `https://subdomain.subdomain.example.com/page`). 
-- `http://example.com/*` - Ignores all URLs that start with `http://example.com/`.
+- `https://*.domain.com*` - Ignores all subdomains of `domain.com` such as `https://sub.domain.com` or `https://sub2.domain.com/page`, etc.
 
-## Outputs
 
-This action does not produce any outputs. However, at the end of the analysis, it prints a summary of the results with: 
+## GitHub Action
 
-* Number of pages analyzed
-* Number of links analyzed
-* Total number of links working
-* Total number of links not working
-* Number of external links working
-* Number of external links not working
-* Number of internal links working
-* Number of internal links not working
+This tool can also be used as a GitHub Action to automatically check links in your repository.
 
-## Examples of Usage
+### Inputs
+- `url` (optional): The base URL to start scraping from. Default is `http://localhost:4444/`.
+- `only-errors` (optional): If set to true, only display errors. Default is `false`.
+- `ignore-file` (optional): Path to the ignore file. Default is `./check-ignore`. If the parameter is set and the file does not exist, the action exits with an error.
 
-### Basic Usage (external URL)
-```yaml
+### Outputs
+
+This action does not produce any outputs. However, at the end of the analysis, it prints a summary of the results with:
+
+- Number of pages analyzed
+- Number of links analyzed
+- Total number of links working
+- Total number of links not working
+- Number of external links working
+- Number of external links not working
+- Number of internal links working
+- Number of internal links not working
+
+### Examples of Usage
+
+#### Basic Usage (external URL)
 name: Link Checker
 
 on: [push]
@@ -60,9 +82,7 @@ jobs:
           url: 'http://example.com'
           only-errors: 'true'
 
-```yaml
-
-### Mkdocs Preview and Link Check
+#### Check links with MkDocs
 
 ```yaml
 name: MkDocs Preview and Link Check
@@ -105,7 +125,7 @@ jobs:
           ignore-file: './check-ignore'
 ```
 
-### Quarto Preview and Link Check
+#### Check links with Quarto
 
 ```yaml
 name: Quarto Preview and Link Check
@@ -140,8 +160,5 @@ jobs:
           only-errors: 'true'
           ignore-file: './check-ignore'
 ```
-
-
-
 ## License
-This project is licensed under the terms of the GNU [General Public License v3.0](LICENSE) by merlos.
+This project is licensed under the terms of the [GNU General Public License v3.0](LICENSE) by merlos.
