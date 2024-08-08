@@ -209,6 +209,10 @@ To run the tests, use the following command:
 python -m unittest discover tests
 ```
 
+## Known issues
+
+* Some pages return 403 when accessed by the tool. For example: https://www.unicef.org. This may be because the page is behind a WAF or a bot detection system?
+* If the current url being examined does not end with slash (ex `https://site.com/folder/subfolder`), but it is a folder, and within that page a relative link (such as `../mypage`), the tool will resolve `https://site.com//mypage` as link rather than `https://site.com/folder/mypage`. This is because the tool does not know that the current page is a folder or not.
 
 ## License
 This project is licensed under the terms of the [GNU General Public License v3.0](LICENSE) by merlos.
