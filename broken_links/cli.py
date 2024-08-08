@@ -1,5 +1,5 @@
 import argparse
-from .link_checker import scrape_links, load_ignore_patterns
+from .broken_links import scrape_links, load_ignore_patterns
 
 def main():
     parser = argparse.ArgumentParser(description="Scrape a website and check all links.")

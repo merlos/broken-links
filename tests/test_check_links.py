@@ -1,7 +1,7 @@
 import requests
 import unittest
 from unittest.mock import patch
-from link_checker.link_checker import check_link
+from broken_links.broken_links import check_link
 
 class TestCheckLinks(unittest.TestCase):
 

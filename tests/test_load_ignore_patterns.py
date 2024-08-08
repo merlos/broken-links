@@ -1,5 +1,5 @@
 import unittest
-from link_checker.link_checker import load_ignore_patterns
+from broken_links.broken_links import load_ignore_patterns
 import os
 
 class TestLoadIgnorePatterns(unittest.TestCase):

@@ -1,5 +1,5 @@
 import unittest
-from link_checker.link_checker import should_ignore
+from broken_links.broken_links import should_ignore
 
 class TestShouldIgnore(unittest.TestCase):
 
