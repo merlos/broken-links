@@ -14,7 +14,7 @@ inputs:
   ignore-file:
     description: 'Path to the ignore file'
     required: false
-    default: './check-ignore'
+    default: './.check-ignore'
 
 runs:
   using: 'docker'
