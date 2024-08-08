@@ -8,6 +8,8 @@ class TestLoadIgnorePatterns(unittest.TestCase):
         self.test_file = 'test_ignore_file.txt'
         with open(self.test_file, 'w') as f:
             f.write('http://example.com/ignore-this-page\n')
+            f.write('http://example.com/ignore-this-page2 #comment\n')
+            f.write('#comment\n')
             f.write('http://example.com/ignore/*\n')
             f.write('*/ignore-this-path/*\n')
             f.write('https://*.domain.com\n')
@@ -23,6 +25,12 @@ class TestLoadIgnorePatterns(unittest.TestCase):
         self.assertIn('http://example.com/ignore/*', patterns)
         self.assertIn('*/ignore-this-path/*', patterns)
         self.assertIn('https://*.domain.com', patterns)
+
+        # Check comments are removed
+        self.assertNotIn('#comment', patterns)
+
+        # Check final line comments are removed and the page is still added
+        self.assertIn('http://example.com/ignore-this-page2', patterns) 
 
     def test_load_ignore_patterns_file_not_exist(self):
         patterns = load_ignore_patterns('non_existent_file.txt')

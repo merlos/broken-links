@@ -44,6 +44,10 @@ def load_ignore_patterns(ignore_file):
 
     with open(ignore_file, 'r') as file:
         patterns = [line.strip() for line in file if line.strip()]
+        # Remove comments. Anything after a '#' is considered a comment.
+        patterns = [pattern.split('#')[0].strip() for pattern in patterns]
+        # remove empty lines
+        patterns = [pattern for pattern in patterns if pattern]
     if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
         logging.debug(f"Loaded ignore patterns: {patterns}")  
     return patterns
