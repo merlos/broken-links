@@ -1,6 +1,6 @@
 name: Link Checker
 description: A GitHub Action to check links on a website.
-author: Your Name
+author: merlos
 
 inputs:
   url:
@@ -11,6 +11,10 @@ inputs:
     description: 'Only display errors'
     required: false
     default: 'false'
+  ignore-file:
+    description: 'Path to the ignore file'
+    required: false
+    default: './check-ignore'
 
 runs:
   using: 'docker'
@@ -18,6 +22,7 @@ runs:
   args:
     - ${{ inputs.url }}
     - ${{ inputs.only-errors }}
+    - ${{ inputs.ignore-file }}
 
 branding:
   icon: 'link'

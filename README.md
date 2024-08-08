@@ -12,6 +12,20 @@ This GitHub Action scrapes all pages within a specified URL and checks if the de
 
 **Optional** If set to `true`, only display errors. Default is `false`.
 
+### `ignore-file`
+
+**Optional** Path to the ignore file. Default is `./check-ignore`. If the parameter is set and the file does not exist, the action exits with an error.
+
+#### Ignore File Format
+
+The ignore file should contain one URL pattern per line. The patterns can include wildcards (`*`) to match multiple URLs. Here are some examples:
+
+- `http://example.com/ignore-this-page` - Ignores this specific URL.
+- `http://example.com/ignore/*` - Ignores all URLs that start with `http://example.com/ignore/`.
+- `*/ignore-this-path/*` - Ignores all URLs that contain `/ignore-this-path/`.
+- https://*.example.com* - Ignores all the urls in domain and subdomain of `example.com` (f.i. `https://www.example.com`, `https://subdomain.example.com`, `https://subdomain.subdomain.example.com/page`). 
+- `http://example.com/*` - Ignores all URLs that start with `http://example.com/`.
+
 ## Outputs
 
 This action does not produce any outputs. However, at the end of the analysis, it prints a summary of the results with: 
@@ -45,44 +59,10 @@ jobs:
         with:
           url: 'http://example.com'
           only-errors: 'true'
-```
-
-### Check links with quarto 
 
 ```yaml
-name: Quarto Preview and Link Check
 
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  preview_and_check:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up Quarto
-        uses: quarto-dev/quarto-actions/setup@v2
-
-      - name: Render Quarto project
-        run: quarto preview --port 4444 &
-        continue-on-error: true
-
-      - name: Wait for server to start
-        run: sleep 10
-
-      - name: Run Link Checker
-        uses: ./
-        with:
-          url: 'http://localhost:4444'
-          only-errors: 'true'
-```
-
-### Check links with MKDocs
+### Mkdocs Preview and Link Check
 
 ```yaml
 name: MkDocs Preview and Link Check
@@ -122,7 +102,46 @@ jobs:
         with:
           url: 'http://localhost:4444'
           only-errors: 'true'
+          ignore-file: './check-ignore'
 ```
 
+### Quarto Preview and Link Check
+
+```yaml
+name: Quarto Preview and Link Check
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  preview_and_check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Render Quarto project
+        run: quarto preview --port 444 &
+        continue-on-error: true
+
+      - name: Wait for server to start
+        run: sleep 10
+
+      - name: Run Link Checker
+        uses: ./
+        with:
+          url: 'http://localhost:444'
+          only-errors: 'true'
+          ignore-file: './check-ignore'
+```
+
+
+
 ## License
-This project is licensed under the terms of the GNU [General Public License v3.0](LICENSE) by merlos
+This project is licensed under the terms of the GNU [General Public License v3.0](LICENSE) by merlos.

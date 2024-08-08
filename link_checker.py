@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import argparse
 from urllib.parse import urljoin, urlparse
+import fnmatch
+import os
 
 def check_link(url):
     """
@@ -19,13 +21,47 @@ def check_link(url):
     except requests.RequestException:
         return False
 
-def scrape_links(base_url, only_error):
+def load_ignore_patterns(ignore_file):
+    """
+    Loads ignore patterns from a file.
+
+    Args:
+        ignore_file (str): The path to the ignore file.
+
+    Returns:
+        list: A list of ignore patterns.
+    """
+    if not os.path.exists(ignore_file):
+        return []
+
+    with open(ignore_file, 'r') as file:
+        patterns = [line.strip() for line in file if line.strip()]
+    return patterns
+
+def should_ignore(url, patterns):
+    """
+    Checks if a URL should be ignored based on patterns.
+
+    Args:
+        url (str): The URL to check.
+        patterns (list): A list of ignore patterns.
+
+    Returns:
+        bool: True if the URL should be ignored, False otherwise.
+    """
+    for pattern in patterns:
+        if fnmatch.fnmatch(url, pattern):
+            return True
+    return False
+
+def scrape_links(base_url, only_error, ignore_patterns):
     """
     Scrapes all pages within a URL and checks if the destination links exist.
 
     Args:
         base_url (str): The base URL to start scraping from.
         only_error (bool): If True, only display errors.
+        ignore_patterns (list): A list of ignore patterns.
 
     Returns:
         None
@@ -56,6 +92,12 @@ def scrape_links(base_url, only_error):
                 anchor_text = link.text.strip()
                 link_url = urljoin(base_url, link['href'])
                 links_analyzed += 1
+
+                if should_ignore(link_url, ignore_patterns):
+                    if not only_error:
+                        print(f"Page: {url}, Anchor: {anchor_text}, Link: {link_url}, Ignored: True")
+                    continue
+
                 is_working = check_link(link_url)
                 if is_working:
                     total_links_working += 1
@@ -95,6 +137,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Scrape a website and check all links.")
     parser.add_argument("url", nargs="?", default="http://localhost:4444/", help="The base URL to start scraping from.")
     parser.add_argument("--only-error", "-o", action="store_true", help="Only display errors.")
+    parser.add_argument("--ignore-file", "-i", default="./check-ignore", help="Path to the ignore file.")
     args = parser.parse_args()
 
-    scrape_links(args.url, args.only_error)
+    ignore_patterns = load_ignore_patterns(args.ignore_file)
+    if args.ignore_file != "./check-ignore" and not ignore_patterns:
+        print(f"Ignore file '{args.ignore_file}' does not exist or is empty.")
+        exit(1)
+
+    scrape_links(args.url, args.only_error, ignore_patterns)
