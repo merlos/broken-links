@@ -1,0 +1,25 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "release/*" ]
+
+jobs:
+
+  build-docker-image:
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get version number from branch name
+        id: get_version
+        run: |
+          # Extract the version number by removing the 'release/' prefix
+          VERSION=$(echo "${{ github.ref_name }}" | sed 's/release\///')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Output the version number
+        run: echo "Version that will be built ${{ env.VERSION }}"
+        
+      - uses: actions/checkout@v4
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag broken-links:${{ env.VERSION }}-$(date +%s)
