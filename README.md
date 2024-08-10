@@ -4,9 +4,6 @@ This tool scrapes all pages within a specified URL and checks if the destination
 
 It can be run as a GitHub Action or as a command line tool.
 
-# Usage
-
-
 ## GitHub Action
 
 This tool can also be used as a GitHub Action to automatically check links in your repository.
@@ -15,8 +12,6 @@ This tool can also be used as a GitHub Action to automatically check links in yo
 - `url` (optional): The base URL to start scraping from. Default is `http://localhost:4444/`.
 - `only-errors` (optional): If set to true, only display errors. Default is `false`.
 - `ignore-file` (optional): Path to the ignore file. Default is `./check-ignore`. If the parameter is set and the file does not exist, the action exits with an error. See _Ignore File Format_ section above for more information.
-
-
 
 ### Ignore File Format
 
@@ -58,7 +53,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run Link Checker
-        uses: ./
+        uses: merlos/broken-links@0.2.2
         with:
           url: 'http://example.com'
           only-errors: 'true'
@@ -100,7 +95,7 @@ jobs:
         run: sleep 10
 
       - name: Run Link Checker
-        uses: ./
+        uses: merlos/broken-links@0.2.2
         with:
           url: 'http://localhost:4444'
           only-errors: 'true'
@@ -136,7 +131,7 @@ jobs:
         run: sleep 10
 
       - name: Run Link Checker
-        uses: ./
+        uses: merlos/broken-links@0.2.2
         with:
           url: 'http://localhost:444'
           only-errors: 'true'
