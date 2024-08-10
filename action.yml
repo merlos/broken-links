@@ -1,5 +1,5 @@
 name: Broken links Checker
-description: A GitHub Action to check the broken links on a website.
+description: Check the broken links of a website.
 author: merlos
 
 inputs:
