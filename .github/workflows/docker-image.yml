@@ -3,7 +3,7 @@ name: Docker Image CI
 on:
   push:
     tags:
-      - '*.*.*'  # Matches tags like v1.2.3, v0.1.0, etc.
+      - '*.*.*'  # Matches tags like 0.1.0, etc. that are the ones used on 
 jobs:
 
   build-docker-image:
@@ -13,8 +13,8 @@ jobs:
       - name: Get version number from branch name
         id: get_version
         run: |
-          # Extract the version number by removing the 'release/' prefix
-          VERSION=$(echo "${{ github.ref_name }}" | sed 's/release\///')
+          # Extract the version number directly from the tag name
+          VERSION=$(echo "${{ github.ref_name }}" | sed 's/refs\/tags\///')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Output the version number
