@@ -187,15 +187,11 @@ Set a virtual environment:
 python -m venv venv
 source venv/bin/activate
 ```
-
+Install the package in edit mode (`-e`)
 ```sh
-pip install .
+pip install -e .
 ```
-
-
 Start coding!
-
-
 
 ### Build the docker image
 
@@ -212,7 +208,8 @@ To run the tests, use the following command:
 ```sh
 python -m unittest discover tests
 ```
-
+## Contributing
+Fork and send a pull request. Please update/add the unit tests.
 
 ## License
 This project is licensed under the terms of the [GNU General Public License v3.0](LICENSE) by merlos.
