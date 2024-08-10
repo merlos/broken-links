@@ -6,34 +6,17 @@ It can be run as a GitHub Action or as a command line tool.
 
 # Usage
 
-### Command-Line Utility
 
-#### Installation
+## GitHub Action
 
-1. Clone the repository:
+This tool can also be used as a GitHub Action to automatically check links in your repository.
 
-   ```sh
-   git clone https://github.com/merlos/broken-links.git
-   cd broken-links
-   ````
-
-2. Install the package:
-
-    ```
-    pip install .
-    ```
-
-3. Use the `broken-links` command to run the script:
-
-```
-broken-links http://example.com --only-error --ignore-file ./check-ignore
-```
-
-Command-line arguments:
-
+### Inputs
 - `url` (optional): The base URL to start scraping from. Default is `http://localhost:4444/`.
-- `--only-error` or `-o` (optional): If set, only display errors. Default is `false`.
-- `--ignore-file` or `-i` (optional): Path to the ignore file. Default is `./check-ignore`. If the parameter is NOT set and the file does not exist, it checks all the links. If the parameter is set and the file does not exist, the tool exits with an error. 
+- `only-errors` (optional): If set to true, only display errors. Default is `false`.
+- `ignore-file` (optional): Path to the ignore file. Default is `./check-ignore`. If the parameter is set and the file does not exist, the action exits with an error. See _Ignore File Format_ section above for more information.
+
+
 
 ### Ignore File Format
 
@@ -44,15 +27,6 @@ The ignore file should contain one URL pattern per line. The patterns can includ
 - `*/ignore-this-path/*` - Ignores all URLs that contain `/ignore-this-path/`.
 - `https://*.domain.com*` - Ignores all subdomains of `domain.com` such as `https://sub.domain.com` or `https://sub2.domain.com/page`, etc.
 
-
-## GitHub Action
-
-This tool can also be used as a GitHub Action to automatically check links in your repository.
-
-### Inputs
-- `url` (optional): The base URL to start scraping from. Default is `http://localhost:4444/`.
-- `only-errors` (optional): If set to true, only display errors. Default is `false`.
-- `ignore-file` (optional): Path to the ignore file. Default is `./check-ignore`. If the parameter is set and the file does not exist, the action exits with an error. See _Ignore File Format_ section above for more information.
 
 ### Outputs
 
@@ -168,6 +142,36 @@ jobs:
           only-errors: 'true'
           ignore-file: './check-ignore'
 ```
+
+
+## Command-Line Utility
+
+#### Installation
+
+1. Clone the repository:
+
+   ```sh
+   git clone https://github.com/merlos/broken-links.git
+   cd broken-links
+   ````
+
+2. Install the package:
+
+    ```
+    pip install .
+    ```
+
+3. Use the `broken-links` command to run the script:
+
+```
+broken-links http://example.com --only-error --ignore-file ./check-ignore
+```
+
+Command-line arguments:
+
+- `url` (optional): The base URL to start scraping from. Default is `http://localhost:4444/`.
+- `--only-error` or `-o` (optional): If set, only display errors. Default is `false`.
+- `--ignore-file` or `-i` (optional): Path to the ignore file. Default is `./check-ignore`. If the parameter is NOT set and the file does not exist, it checks all the links. If the parameter is set and the file does not exist, the tool exits with an error. 
 
 
 ## Development
