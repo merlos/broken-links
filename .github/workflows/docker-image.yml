@@ -2,8 +2,8 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "release/*" ]
-
+    tags:
+      - '*.*.*'  # Matches tags like v1.2.3, v0.1.0, etc.
 jobs:
 
   build-docker-image:
@@ -22,4 +22,5 @@ jobs:
         
       - uses: actions/checkout@v4
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag broken-links:${{ env.VERSION }}-$(date +%s)
+        run: docker build . --file Dockerfile --tag broken-links:${{ env.VERSION }}-$(date +%Y-%m-%d)
+
