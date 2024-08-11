@@ -4,9 +4,12 @@ This tool scrapes all pages within a specified URL and checks if the destination
 
 It can be run as a **GitHub Action** or as a **command line tool**.
 
-[GitHub Action Documentation](Github-Action)
 
-## GitHub Action
+* [GitHub Action Use](#github-action-use)
+* [Command-Line Tool Use](#comman-line-tool-use) (pypi)
+* [Docker Image Use](#docker-image-use)
+
+## GitHub Action Use
 
 This tool can also be used as a GitHub Action to automatically check links in your repository.
 
@@ -141,28 +144,20 @@ jobs:
 ```
 
 
-## Command-Line Utility
+## Command-Line Tool Use
 
 #### Installation
 
-1. Clone the repository:
-
-   ```sh
-   git clone https://github.com/merlos/broken-links.git
-   cd broken-links
-   ````
-
-2. Install the package:
-
+1. Install the package:
+    ```sh
+    pip install broken-links
     ```
-    pip install .
-    ```
+    
+3. Use the `broken-links` command:
 
-3. Use the `broken-links` command to run the script:
-
-```
-broken-links http://example.com --only-error --ignore-file ./check-ignore
-```
+  ```sh
+  broken-links http://example.com --only-error --ignore-file ./check-ignore
+  ```
 
 Command-line arguments:
 
@@ -170,8 +165,35 @@ Command-line arguments:
 - `--only-error` or `-o` (optional): If set, only display errors. Default is `false`.
 - `--ignore-file` or `-i` (optional): Path to the ignore file. Default is `./check-ignore`. If the parameter is NOT set and the file does not exist, it checks all the links. If the parameter is set and the file does not exist, the tool exits with an error. 
 
+The format of the ignore file is explained in the [Ignore File Format (#ignore-file-format) section above.
+
+## Docker Image Use
+
+The docker image has been built for these architectures: `arm64`, `amd64`, and `arm7` and has been released in [docker-hub](https://hub.docker.com/repository/docker/merlos/broken-links/general) and [GitHub Container Registy](https://github.com/merlos/broken-links/pkgs/container/broken-links)
+
+
+1. Get the image
+```sh
+docker pull merlos/broken-links:latest
+# or from GitHub Container Registry
+docker pull ghcr.io/merlos/broken-links:latest
+```
+
+2. Run the container
+```sh
+docker run -ti merlos/broken-links https://www.example.com
+```
+The arguments are the same as the command line (`url`, `--only-error`, `--ignore-file`) as explained above. The `-ti` option used with `docker` run displays the output of the command as it is generated.  
+
+In order to use the `--ignore-file` argument you need to mount a volume. For example:
+
+```sh
+docker run -ti -v /path/on/host/to/ignore-file:/ignore-file merlos/broken-links https://www.example.com --ignore-file /ignore-file
+```
 
 ## Development
+
+It has been developed using python. So you need to have python installed in your system.
 
 Clone the repository:
 ```sh
@@ -196,7 +218,7 @@ Start coding!
 docker build -t broken-links .
 ```
 ```sh
-docker run --rm broken-links http://example.com --only-error --ignore-file ./check-ignore
+docker run --rm broken-links http://example.com --only-error 
 ```
 
 ### Tests
