@@ -63,14 +63,16 @@ jobs:
         with:
           context: .
           push: true
+          sbom: true
+          provenance: mode=max
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64,linux/arm/v7
 
      # - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-name: merlos/broken-links
-          subject-digest: ${{ steps.push.outputs.digest }}
-          push-to-registry: true
+     #   uses: actions/attest-build-provenance@v1
+     #   with:
+     #     subject-name: merlos/broken-links
+     #     subject-digest: ${{ steps.push.outputs.digest }}
+     #     push-to-registry: true
 
