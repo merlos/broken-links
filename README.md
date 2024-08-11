@@ -1,12 +1,12 @@
-# Broken links Checker GitHub Action && command line tool
+# Broken links Checker
 
-This tool scrapes all pages within a specified URL and checks if the destination links exist. It reports the original page, the text of the anchor, the destination URL, and whether the link is working or not. If any link does not work, the tool exits with an error code. It also provides a summary of the analysis.
+This tool scrapes all pages within a specified URL and checks if the destination links exist. It reports the original page, the text of the anchor, the destination URL, and whether the link is working or not. If any of the links does not work, the tool exits with an error code. It also provides a summary of the analysis.
 
-It can be run as a **GitHub Action** or as a **command line tool**.
+It can be run as a **GitHub Action**, as a **command line tool** and as a **Docker Container((.
 
 
 * [GitHub Action Use](#github-action-use)
-* [Command-Line Tool Use](#comman-line-tool-use) (pypi)
+* [Command-Line Tool Use](#command-line-tool-use) (pypi)
 * [Docker Image Use](#docker-image-use)
 
 ## GitHub Action Use
