@@ -2,7 +2,9 @@
 
 This tool scrapes all pages within a specified URL and checks if the destination links exist. It reports the original page, the text of the anchor, the destination URL, and whether the link is working or not. If any link does not work, the tool exits with an error code. It also provides a summary of the analysis.
 
-It can be run as a GitHub Action or as a command line tool.
+It can be run as a **GitHub Action** or as a **command line tool**.
+
+[GitHub Action Documentation](Github-Action)
 
 ## GitHub Action
 
